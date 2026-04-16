@@ -31,12 +31,17 @@ const inputSignaling     = document.getElementById('input-signaling');
 const inputTurn          = document.getElementById('input-turn');
 const settingsError      = document.getElementById('settings-error');
 const settingsSaved      = document.getElementById('settings-saved');
+const btnToggleImmersive     = document.getElementById('btn-toggle-immersive');
+const btnToggleImmersiveRoom = document.getElementById('btn-toggle-immersive-room');
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 
 chrome.runtime.sendMessage({ type: 'GET_STATE' }, (state) => {
   if (state) applyState(state);
 });
+
+// Sync immersive toggle state on popup open (applies to both room and settings views).
+syncImmersiveToggle();
 
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === 'ROOM_STATE') applyState(msg.state);
@@ -52,7 +57,56 @@ btnSettings.addEventListener('click', () => {
     settingsSaved.hidden = true;
     viewIdle.hidden      = true;
     viewSettings.hidden  = false;
+    syncImmersiveToggle();
   });
+});
+
+// Immersive mode toggle — reads/writes the same localStorage key as the overlay.
+// The popup and the content script share the page's localStorage only when the
+// popup is opened on a Bilibili tab; for cross-tab persistence we also mirror
+// the value into chrome.storage.local so the overlay can pick it up on load.
+
+function getImmersivePrefs() {
+  try {
+    const raw = localStorage.getItem('yuki-prefs');
+    return raw ? JSON.parse(raw) : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function syncImmersiveToggle() {
+  chrome.storage.local.get(['yukiImmersive'], (res) => {
+    const on = !!res.yukiImmersive;
+    setImmersiveUI(on);
+  });
+}
+
+function setImmersiveUI(on) {
+  [btnToggleImmersive, btnToggleImmersiveRoom].forEach((btn) => {
+    btn.setAttribute('aria-checked', String(on));
+    btn.classList.toggle('on', on);
+  });
+}
+
+function applyImmersive(next) {
+  setImmersiveUI(next);
+  chrome.storage.local.set({ yukiImmersive: next });
+  chrome.tabs.query({ url: '*://*.bilibili.com/video/*' }, (tabs) => {
+    tabs.forEach((tab) => {
+      chrome.tabs.sendMessage(tab.id, { type: 'SET_IMMERSIVE', immersive: next }, () => {
+        void chrome.runtime.lastError;
+      });
+    });
+  });
+}
+
+btnToggleImmersive.addEventListener('click', () => {
+  applyImmersive(btnToggleImmersive.getAttribute('aria-checked') !== 'true');
+});
+
+btnToggleImmersiveRoom.addEventListener('click', () => {
+  applyImmersive(btnToggleImmersiveRoom.getAttribute('aria-checked') !== 'true');
 });
 
 btnBack.addEventListener('click', () => {

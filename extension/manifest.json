@@ -6,6 +6,7 @@
 
   "permissions": [
     "storage",
+    "tabs",
     "alarms",
     "activeTab",
     "offscreen"
@@ -26,7 +27,7 @@
         "*://*.bilibili.com/video/*",
         "*://*.bilibili.com/bangumi/play/*"
       ],
-      "js": ["content/content.js", "content/overlay.js"],
+      "js": ["content/content.js", "content/overlay.js", "content/overlay-status.js", "content/overlay-fab.js"],
       "run_at": "document_idle"
     }
   ],

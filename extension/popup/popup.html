@@ -94,6 +94,17 @@
       <a id="push-video-link" class="push-banner-link" href="#" target="_blank"></a>
     </div>
 
+    <!-- Overlay: immersive mode toggle -->
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <span class="toggle-label">Immersive mode</span>
+        <span class="toggle-desc">Hide overlay while connected. Shows on disconnection.</span>
+      </div>
+      <button class="toggle-btn" id="btn-toggle-immersive-room" role="switch" aria-checked="false">
+        <span class="toggle-thumb"></span>
+      </button>
+    </div>
+
     <button id="btn-leave" class="btn-danger">Leave Room</button>
   </div>
 
@@ -115,6 +126,16 @@
       <input id="input-turn" class="field-input" type="text" placeholder="turn:your-server.com:3478" spellcheck="false" autocomplete="off" />
 
       <p class="settings-note">Takes effect on the next room join.</p>
+
+      <div class="toggle-row" id="toggle-immersive-row">
+        <div class="toggle-info">
+          <span class="toggle-label">Immersive mode</span>
+          <span class="toggle-desc">Hide the overlay while connected. Only shows on disconnection.</span>
+        </div>
+        <button class="toggle-btn" id="btn-toggle-immersive" role="switch" aria-checked="false">
+          <span class="toggle-thumb"></span>
+        </button>
+      </div>
 
       <button id="btn-save-settings">Save</button>
       <button id="btn-reset-settings" class="btn-secondary">Reset to defaults</button>

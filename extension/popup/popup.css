@@ -1,11 +1,33 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+html, body {
+  overflow: hidden;
+}
+
 body {
   width: 320px;
   padding: 20px;
   font: 14px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #1a1a1a;
   background: #f7f8fa;
+}
+
+/* Custom slim scrollbar on the body itself */
+body::-webkit-scrollbar {
+  width: 4px;
+}
+
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: rgba(251, 114, 153, 0.35);
+  border-radius: 99px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 114, 153, 0.65);
 }
 
 /* ── Header ── */
@@ -438,6 +460,89 @@ button:disabled {
   padding: 6px;
   background: #e8f5e9;
   border-radius: 6px;
+}
+
+/* ── Immersive toggle ── */
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  margin-bottom: 10px;
+}
+
+.toggle-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.toggle-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.toggle-desc {
+  display: block;
+  font-size: 11px;
+  color: #999;
+  line-height: 1.4;
+}
+
+.toggle-btn {
+  width: 38px;
+  height: 22px;
+  padding: 0;
+  border-radius: 99px;
+  background: #ddd;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  transition: background 0.2s;
+  margin-top: 0;
+}
+
+.toggle-btn:hover { background: #ccc; }
+
+.toggle-btn.on { background: #fb7299; }
+.toggle-btn.on:hover { background: #e85c85; }
+
+.toggle-btn:active { transform: none; }
+
+.toggle-thumb {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s;
+}
+
+.toggle-btn.on .toggle-thumb {
+  transform: translateX(16px);
+}
+
+/* Inside a settings card, override to borderless inset style */
+.card .toggle-row {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 14px;
+  margin-bottom: 0;
+  padding: 12px 0 4px;
 }
 
 /* ── Sync toggle (viewer) ── */
