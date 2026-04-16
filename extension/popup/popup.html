@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YukiBiliSync</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <!-- View: not in a room -->
+  <div id="view-idle">
+    <header>
+      <img src="../icons/icon-48.png" class="logo" alt="" />
+      <div class="header-text">
+        <div class="app-name">YukiBiliSync</div>
+        <div class="app-sub">Watch Bilibili together</div>
+      </div>
+      <button id="btn-settings" class="btn-icon" title="Server settings" aria-label="Server settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="card">
+      <div class="card-title">Start a room</div>
+      <div class="card-desc">Share the code with friends and watch in sync.</div>
+      <button id="btn-create">Create Room</button>
+    </div>
+
+    <div class="divider"><span>or join one</span></div>
+
+    <div class="card">
+      <div class="card-title">Join a room</div>
+      <div class="card-desc">Enter the 6-character code from your friend.</div>
+      <div class="input-row">
+        <input id="input-code" type="text" maxlength="6" placeholder="XXXXXX" spellcheck="false" autocomplete="off" />
+        <button id="btn-join">Join</button>
+      </div>
+    </div>
+
+    <p id="error-msg" class="error" hidden></p>
+  </div>
+
+  <!-- View: in a room -->
+  <div id="view-room" hidden>
+    <header>
+      <img src="../icons/icon-48.png" class="logo" alt="" />
+      <div>
+        <div class="app-name">YukiBiliSync</div>
+        <div id="status-badge" class="badge"></div>
+      </div>
+    </header>
+
+    <div class="card room-card">
+      <div class="card-title">Room code</div>
+      <div id="room-code" class="code-display"></div>
+      <button id="btn-copy" class="btn-secondary">Copy code</button>
+    </div>
+
+    <div class="meta-row">
+      <div class="meta-item">
+        <div class="meta-label">Role</div>
+        <div id="room-role" class="meta-value"></div>
+      </div>
+      <div class="meta-divider"></div>
+      <div class="meta-item">
+        <div class="meta-label">Members</div>
+        <div id="room-members" class="meta-value"></div>
+      </div>
+    </div>
+
+    <!-- Host only: viewer status list -->
+    <div id="viewer-list" hidden></div>
+
+    <!-- Host only: pending jump requests -->
+    <div id="request-list" hidden></div>
+
+    <!-- Host only: set current page as active video -->
+    <button id="btn-set-active" class="btn-secondary" hidden>Set current page as active video</button>
+    <div id="active-video-label" class="active-video-label" hidden></div>
+
+    <!-- Host only: push current video to viewers -->
+    <button id="btn-push-video" class="btn-secondary" hidden>Push video to viewers</button>
+
+    <!-- Viewer only: sync toggle -->
+    <button id="btn-sync-toggle" class="btn-secondary" hidden></button>
+
+    <!-- Viewer only: host pushed a video -->
+    <div id="push-video-banner" class="push-banner" hidden>
+      <span class="push-banner-label">Host wants to watch:</span>
+      <a id="push-video-link" class="push-banner-link" href="#" target="_blank"></a>
+    </div>
+
+    <button id="btn-leave" class="btn-danger">Leave Room</button>
+  </div>
+
+  <!-- View: settings -->
+  <div id="view-settings" hidden>
+    <div class="settings-header">
+      <button id="btn-back" class="btn-back">&#8592; Back</button>
+      <span class="settings-title">Server Settings</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Self-hosted server</div>
+      <div class="card-desc">Enter the URLs for your deployed YukiBiliSync signaling and TURN server.</div>
+
+      <label class="field-label" for="input-signaling">Signaling server</label>
+      <input id="input-signaling" class="field-input" type="url" placeholder="wss://your-server.com:8444/signal" spellcheck="false" autocomplete="off" />
+
+      <label class="field-label" for="input-turn">TURN server</label>
+      <input id="input-turn" class="field-input" type="text" placeholder="turn:your-server.com:3478" spellcheck="false" autocomplete="off" />
+
+      <p class="settings-note">Takes effect on the next room join.</p>
+
+      <button id="btn-save-settings">Save</button>
+      <button id="btn-reset-settings" class="btn-secondary">Reset to defaults</button>
+
+      <p id="settings-error" class="error" hidden></p>
+      <p id="settings-saved" class="settings-saved" hidden>Saved.</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

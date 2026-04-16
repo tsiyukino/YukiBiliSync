@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Background rounded square -->
+  <rect width="128" height="128" rx="24" ry="24" fill="#fb7299"/>
+
+  <!-- Antenna left -->
+  <rect x="38" y="8" width="10" height="20" rx="5" ry="5" fill="#fff"/>
+  <!-- Antenna right -->
+  <rect x="80" y="8" width="10" height="20" rx="5" ry="5" fill="#fff"/>
+
+  <!-- TV head body -->
+  <rect x="16" y="24" width="96" height="72" rx="14" ry="14" fill="#fff"/>
+
+  <!-- Left eye -->
+  <circle cx="46" cy="57" r="10" fill="#fb7299"/>
+  <!-- Right eye -->
+  <circle cx="82" cy="57" r="10" fill="#fb7299"/>
+
+  <!-- Smile -->
+  <path d="M42 76 Q64 92 86 76" stroke="#fb7299" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+  <!-- Sync arrows (bottom bar) — two small arcs suggesting sync -->
+  <path d="M38 108 A18 18 0 0 1 64 95" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <polygon points="64,88 64,102 72,95" fill="#fff"/>
+
+  <path d="M90 108 A18 18 0 0 0 64 95" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <polygon points="64,88 64,102 56,95" fill="#fff"/>
+</svg>

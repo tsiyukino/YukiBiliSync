@@ -1,0 +1,11 @@
+== Deploy updated server with logging ==
+
+On LOCAL machine:
+
+scp D:/Git/yukibilisync/server/src/server.js root@167.172.230.73:/opt/yukibilisync/src/server.js
+
+Then on server:
+
+systemctl restart yukibilisync
+
+journalctl -u yukibilisync -f

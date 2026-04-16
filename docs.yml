@@ -1,0 +1,25 @@
+project: YukiBiliSync
+type: browser-extension + signaling-server
+
+source:
+  extension: extension/
+  server:     server/
+
+docs: docs/
+
+test:
+  server: "(no test suite yet — add one before shipping)"
+  extension: "(manual testing in Chrome/Firefox developer mode)"
+
+conventions:
+  - Plain JS in the extension, no build step, no framework.
+  - The service worker (background/sw.js) owns room state and routes messages.
+    All WebSocket and RTCPeerConnection work runs in the offscreen document
+    (offscreen/offscreen.js), which is created on join and destroyed on leave.
+    Content scripts and popup communicate with sw via chrome.runtime.sendMessage.
+  - Host is always authoritative. Viewers apply what the host sends; they never
+    initiate playback state changes.
+  - TURN relay is the default ICE transport policy (iceTransportPolicy: 'relay').
+    Direct peer-to-peer is opt-in for v2+.
+  - Server env vars required at runtime: TURN_SECRET, TURN_HOST, TLS_CERT,
+    TLS_KEY. PORT defaults to 8443.
