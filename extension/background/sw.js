@@ -255,6 +255,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 // Room lifecycle
 // ---------------------------------------------------------------------------
 
+async function loadServerConfig() {
+  const stored = await chrome.storage.sync.get(['signalingUrl', 'turnUrl']);
+  return {
+    signalingUrl: stored.signalingUrl || '',
+    turnUrl:      stored.turnUrl      || '',
+  };
+}
+
 async function handleCreateRoom() {
   state.isHost          = true;
   state.peerId          = generateId();
@@ -265,12 +273,14 @@ async function handleCreateRoom() {
   state.nextViewerIndex = 1;
   state.pendingRequests = new Map();
 
+  const config = await loadServerConfig();
   await ensureOffscreen();
   const result = await chrome.runtime.sendMessage({
     type:     'OFFSCREEN_JOIN',
     roomCode: state.roomCode,
     peerId:   state.peerId,
     isHost:   true,
+    config,
   });
 
   if (!result?.ok) {
@@ -279,6 +289,7 @@ async function handleCreateRoom() {
   }
 
   state.wsConnected = true;
+  startKeepalive();
   broadcastState();
   return { roomCode: state.roomCode };
 }
@@ -291,12 +302,14 @@ async function handleJoinRoom(roomCode) {
   state.isSynced        = true;
   state.pendingRequests = new Map();
 
+  const config = await loadServerConfig();
   await ensureOffscreen();
   const result = await chrome.runtime.sendMessage({
     type:     'OFFSCREEN_JOIN',
     roomCode: state.roomCode,
     peerId:   state.peerId,
     isHost:   false,
+    config,
   });
 
   if (!result?.ok) {
@@ -305,11 +318,13 @@ async function handleJoinRoom(roomCode) {
   }
 
   state.wsConnected = true;
+  startKeepalive();
   broadcastState();
   return { ok: true };
 }
 
 async function handleLeaveRoom() {
+  stopKeepalive();
   await chrome.runtime.sendMessage({ type: 'OFFSCREEN_LEAVE' }).catch(() => {});
   await closeOffscreen();
   resetState();
@@ -432,6 +447,29 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 function isBilibiliVideoTab(url) {
   return url.includes('bilibili.com/video/') || url.includes('bilibili.com/bangumi/play/');
+}
+
+// ---------------------------------------------------------------------------
+// Service worker keepalive
+// MV3 service workers terminate after ~30 s of inactivity. A repeating alarm
+// wakes the SW before that happens, keeping the WebSocket and offscreen document
+// alive for the duration of a room session.
+// ---------------------------------------------------------------------------
+
+const KEEPALIVE_ALARM = 'yukibilisync-keepalive';
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === KEEPALIVE_ALARM) {
+    // Waking up is enough — no work needed.
+  }
+});
+
+function startKeepalive() {
+  chrome.alarms.create(KEEPALIVE_ALARM, { periodInMinutes: 1 / 3 }); // every 20 s
+}
+
+function stopKeepalive() {
+  chrome.alarms.clear(KEEPALIVE_ALARM);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,13 +1,5 @@
 import { DEFAULT_CONFIG } from '../config.js';
 
-async function loadConfig() {
-  const stored = await chrome.storage.sync.get(['signalingUrl', 'turnUrl']);
-  return {
-    signalingUrl: stored.signalingUrl || DEFAULT_CONFIG.signalingUrl,
-    turnUrl:      stored.turnUrl      || DEFAULT_CONFIG.turnUrl,
-  };
-}
-
 // ---------------------------------------------------------------------------
 // State
 // ---------------------------------------------------------------------------
@@ -71,19 +63,19 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 // Join / leave
 // ---------------------------------------------------------------------------
 
-async function handleJoin({ roomCode, peerId, isHost }) {
+async function handleJoin({ roomCode, peerId, isHost, config }) {
   state.peerId   = peerId;
   state.roomCode = roomCode;
   state.isHost   = isHost;
 
-  const config = await loadConfig();
-  if (!config.signalingUrl) {
+  const signalingUrl = (config?.signalingUrl) || DEFAULT_CONFIG.signalingUrl;
+  if (!signalingUrl) {
     resetState();
     return { ok: false, error: 'No signaling server configured. Open the extension settings and enter your server URL.' };
   }
 
   try {
-    await connectSignaling(config.signalingUrl);
+    await connectSignaling(signalingUrl);
     await fetchTurnCredentials();
     sigSend({ type: 'join', roomCode, peerId });
   } catch (err) {
